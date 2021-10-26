@@ -10,8 +10,6 @@ import "hardhat/console.sol";
 contract DesignedVault is AccessibleCommon {
     using SafeERC20 for IERC20;
 
-    uint256 public maxInputOnceTime;
-
     string public name;
 
     IERC20 public doc;
@@ -19,23 +17,22 @@ contract DesignedVault is AccessibleCommon {
     bool public diffClaimCheck;
     bool public tgeCheck;
 
-    uint256 public firstClaimAmount;
-    uint256 public firstClaimTime;
+    uint256 public firstClaimAmount = 0;     //처음클레임이 다른경우 클레임양
+    uint256 public firstClaimTime;          //처음클레임이 다른경우 시간
 
-    uint256 public totalAllocatedAmount;
-    uint256 public totalClaimedAmount;
+    uint256 public totalAllocatedAmount;    //컨트랙트에서 지급되어야하는 Amount
 
-    uint256 public startTime;
-    uint256 public endTime;
-    uint256 public claimPeriodTimes;        //클레임 기간 시간
-    uint256 public claimCounts;             //몇번 클레임 했는지
+    uint256 public startTime;               //클레임 시작시간
+    uint256 public claimPeriodTimes;        //클레임 간격 시간
+    uint256 public totalClaimCounts;        //총 클레임 횟수 (36)
+
+    uint256 public nowClaimRound = 0;       //현재 클레임한 라운드
 
     uint256 public tgeAmount;               //입력 tgeAmount 해야하는 양
     uint256 public tgeTime;                 //tge를 하는 시간
 
-    uint256 public totalClaims;
-    uint256 public totalTgeCount;
-    uint256 public totalTgeAmount;          //실제 tgeAmount
+    uint256 public totalClaimsAmount;           //실제로 지급한 claimAmount
+    uint256 public totalTgeAmount = 0;          //실제로 지급한 tgeAmount
 
     modifier nonZeroAddress(address _addr) {
         require(_addr != address(0), "DesignedVault: zero address");
@@ -52,12 +49,10 @@ contract DesignedVault is AccessibleCommon {
     ///@param _doc Allocated tos address
     constructor(
         string memory _name,
-        address _doc,
-        uint256 _inputMaxOnce
+        address _doc
     ) {
         name = _name;
-        doc = _doc;
-        maxInputOnceTime = _inputMaxOnce;
+        doc = IERC20(_doc);
         _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
         _setupRole(ADMIN_ROLE, msg.sender);
     }
@@ -65,7 +60,7 @@ contract DesignedVault is AccessibleCommon {
     ///@dev initialization function
     ///@param _totalAllocatedAmount total allocated amount
     ///@param _totalClaims total available claim count
-    ///@param _startTime start time             //클레임 시작 시간 (11월 30일 무시, tge무시)
+    ///@param _startTime start time             //클레임 시작 시간 (11월 30일 무시, tge무시, 12월 5일 오후 5시)
     ///@param _periodTimesPerClaim period time per claim
     function initialize(
         uint256 _totalAllocatedAmount,
@@ -74,13 +69,14 @@ contract DesignedVault is AccessibleCommon {
         uint256 _periodTimesPerClaim
     ) external onlyOwner {
         totalAllocatedAmount = _totalAllocatedAmount;
-        totalClaims = _totalClaims;
+        totalClaimCounts = _totalClaims;
         startTime = _startTime;
         claimPeriodTimes = _periodTimesPerClaim;
     }
 
     function diffSetting(
         uint256[2] calldata _tgeAmount,
+        bool _diffFisrt,
         uint256[2] calldata _diffFistClaim
     ) 
         external
@@ -90,10 +86,12 @@ contract DesignedVault is AccessibleCommon {
             _tgeAmount[0],
             _tgeAmount[1]
         );
-        diffFirstClaimSetting(
-            _diffFistClaim[0],
-            _diffFistClaim[1]
-        );
+        if(_diffFisrt){
+            diffFirstClaimSetting(
+                _diffFistClaim[0],
+                _diffFistClaim[1]
+            );
+        }
     }
 
     function tgeSetting(
@@ -136,21 +134,60 @@ contract DesignedVault is AccessibleCommon {
             }
         }
     }
+
+    function calcalClaimAmount(uint256 _round) public view returns (uint256 amount) {
+        uint256 remainAmount;
+        if(diffClaimCheck && _round == 1) {
+            amount = firstClaimAmount;
+        } else if(diffClaimCheck){
+            remainAmount = totalAllocatedAmount - totalTgeAmount - firstClaimAmount;
+            amount = remainAmount/(totalClaimCounts-1);
+        } else {
+            remainAmount = totalAllocatedAmount - totalTgeAmount;
+            amount = remainAmount/totalClaimCounts;
+        }
+    }
     
     function tgeClaim(address _account)        
         external
         onlyOwner
     {   
         require(block.timestamp > tgeTime, "Designed Valut: need the tgeTime");
-        require(doc.balanceOf(address(this)) >= tgeAmount && totalAllocatedAmount >= tgeAmount, "Designed Valut: check the amount");
+        require(doc.balanceOf(address(this)) >= tgeAmount && totalTgeAmount == 0, "Designed Valut: already claim tge");
         totalTgeAmount = totalTgeAmount + tgeAmount;
         doc.safeTransfer(_account, tgeAmount);
     }
 
-    function Claim(address _account)
+    function claim(address _account)
         external
         onlyOwner
     {
+        uint256 count = 0;
+        uint256 time;
+
+        if(diffClaimCheck){
+            time = firstClaimTime;
+        } else {
+            time = startTime;
+        }
+
+        require(block.timestamp > time, "DesignedVault: not started yet");
+
+        uint256 curRound = currentRound();
+
+        uint256 amount = calcalClaimAmount(curRound);
+
+        if(curRound != 1 && diffClaimCheck && totalClaimsAmount < firstClaimAmount) {
+            count = curRound - nowClaimRound;
+            amount = (amount * (count-1)) + firstClaimAmount;
+        } else {
+            count = curRound - nowClaimRound;
+            amount = (amount * count);
+        }
+        
+        nowClaimRound = curRound;
+        totalClaimsAmount = totalClaimsAmount + amount;
+        doc.safeTransfer(_account, tgeAmount);
 
     }
 
