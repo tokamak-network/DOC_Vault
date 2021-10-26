@@ -180,15 +180,18 @@ contract DesignedVault is AccessibleCommon {
         if(curRound != 1 && diffClaimCheck && totalClaimsAmount < firstClaimAmount) {
             count = curRound - nowClaimRound;
             amount = (amount * (count-1)) + firstClaimAmount;
+        } else if (curRound >= totalClaimCounts) {
+            amount = totalAllocatedAmount - totalClaimsAmount;
         } else {
             count = curRound - nowClaimRound;
             amount = (amount * count);
         }
-        
+
+        require(totalAllocatedAmount > totalClaimsAmount,"DesignedVault: already allAmount Claimed");
+
         nowClaimRound = curRound;
         totalClaimsAmount = totalClaimsAmount + amount;
-        doc.safeTransfer(_account, tgeAmount);
-
+        doc.safeTransfer(_account, amount);
     }
 
 }
