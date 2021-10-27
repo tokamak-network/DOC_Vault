@@ -58,8 +58,8 @@ contract DesignedVault is AccessibleCommon {
     }
 
     ///@dev initialization function
-    ///@param _totalAllocatedAmount total allocated amount
-    ///@param _totalClaims total available claim count
+    ///@param _totalAllocatedAmount total allocated amount  //Vault가 가지고 있는 총량
+    ///@param _totalClaims total available claim count  //클레임 총 횟수
     ///@param _startTime start time             //클레임 시작 시간 (11월 30일 무시, tge무시, 12월 5일 오후 5시)
     ///@param _periodTimesPerClaim period time per claim
     function initialize(
@@ -74,10 +74,9 @@ contract DesignedVault is AccessibleCommon {
         claimPeriodTimes = _periodTimesPerClaim;
     }
 
-    function diffSetting(
+    function allSetting(
         uint256[2] calldata _tgeAmount,
-        bool _diffFisrt,
-        uint256[2] calldata _diffFistClaim
+        uint256[2] calldata _fistClaim
     ) 
         external
         onlyOwner
@@ -86,12 +85,10 @@ contract DesignedVault is AccessibleCommon {
             _tgeAmount[0],
             _tgeAmount[1]
         );
-        if(_diffFisrt){
-            diffFirstClaimSetting(
-                _diffFistClaim[0],
-                _diffFistClaim[1]
-            );
-        }
+        firstClaimSetting(
+            _fistClaim[0],
+            _fistClaim[1]
+        );
     }
 
     function tgeSetting(
@@ -100,15 +97,18 @@ contract DesignedVault is AccessibleCommon {
     )
         public
         onlyOwner
+        nonZero(_amount)
+        nonZero(_time)
     {
         tgeAmount = _amount;
         tgeTime = _time;
     }
 
-    function diffFirstClaimSetting(uint256 _amount, uint256 _time)
+    function firstClaimSetting(uint256 _amount, uint256 _time)
         public
         onlyOwner
         nonZero(_amount)
+        nonZero(_time)
     {
         diffClaimCheck = true;
         firstClaimAmount = _amount;
@@ -153,7 +153,7 @@ contract DesignedVault is AccessibleCommon {
         onlyOwner
     {   
         require(block.timestamp > tgeTime, "Designed Valut: need the tgeTime");
-        require(doc.balanceOf(address(this)) >= tgeAmount && totalTgeAmount == 0, "Designed Valut: already claim tge");
+        require(doc.balanceOf(address(this)) >= tgeAmount && totalTgeAmount == 0, "DesignedValut: already get tge");
         totalTgeAmount = totalTgeAmount + tgeAmount;
         doc.safeTransfer(_account, tgeAmount);
     }
@@ -174,20 +174,21 @@ contract DesignedVault is AccessibleCommon {
         require(block.timestamp > time, "DesignedVault: not started yet");
 
         uint256 curRound = currentRound();
-
         uint256 amount = calcalClaimAmount(curRound);
 
         if(curRound != 1 && diffClaimCheck && totalClaimsAmount < firstClaimAmount) {
             count = curRound - nowClaimRound;
             amount = (amount * (count-1)) + firstClaimAmount;
         } else if (curRound >= totalClaimCounts) {
-            amount = totalAllocatedAmount - totalClaimsAmount;
+            amount = totalAllocatedAmount - totalClaimsAmount - totalTgeAmount;
         } else {
             count = curRound - nowClaimRound;
             amount = (amount * count);
         }
-
-        require(totalAllocatedAmount > totalClaimsAmount,"DesignedVault: already allAmount Claimed");
+        
+        require(curRound != nowClaimRound,"DesignedVault: already get this round");
+        require(totalAllocatedAmount > totalClaimsAmount,"DesignedVault: already All get");
+        require(doc.balanceOf(address(this)) >= amount,"DesignedVault: dont have doc");
 
         nowClaimRound = curRound;
         totalClaimsAmount = totalClaimsAmount + amount;
