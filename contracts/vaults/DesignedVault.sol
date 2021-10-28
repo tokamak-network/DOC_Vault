@@ -152,7 +152,7 @@ contract DesignedVault is AccessibleCommon {
         external
         onlyOwner
     {   
-        require(block.timestamp > tgeTime, "Designed Valut: need the tgeTime");
+        require(block.timestamp > tgeTime && tgeAmount != 0, "Designed Valut: need the tgeTime");
         require(doc.balanceOf(address(this)) >= tgeAmount && totalTgeAmount == 0, "DesignedValut: already get tge");
         totalTgeAmount = totalTgeAmount + tgeAmount;
         doc.safeTransfer(_account, tgeAmount);
