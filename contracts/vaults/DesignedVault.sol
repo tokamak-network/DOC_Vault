@@ -194,5 +194,4 @@ contract DesignedVault is AccessibleCommon {
         totalClaimsAmount = totalClaimsAmount + amount;
         doc.safeTransfer(_account, amount);
     }
-
 }
