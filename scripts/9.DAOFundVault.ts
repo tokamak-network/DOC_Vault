@@ -26,7 +26,7 @@ async function main() {
   console.log("DAOFundVault Address:", vaultContract.address);
   
   //전송 후 DOC 토큰 전송 필요
-  //npx hardhat verify a b "DAOFundVault" --network rinkeby
+  //npx hardhat verify a b c --network rinkeby
   //npx hardhat verify --contract contracts/MarketingVault.sol:MarketingVault a b --network rinkeby
 }
 

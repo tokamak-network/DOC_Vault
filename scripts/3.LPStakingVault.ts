@@ -48,7 +48,7 @@ async function main() {
   )
   await tx.wait()
 
-  let tx2 = await vaultContract.totalClaimCounts()
+  let tx2 = Number(await vaultContract.totalClaimCounts())
   console.log("tx2 :", tx2, ", totalClaimCounts : ", totalClaimCounts)
 
   let tx3 = await vaultContract.connect(deployer).allSetting(

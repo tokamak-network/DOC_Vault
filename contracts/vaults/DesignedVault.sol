@@ -5,8 +5,6 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "../common/AccessibleCommon.sol";
 
-import "hardhat/console.sol";
-
 contract DesignedVault is AccessibleCommon {
     using SafeERC20 for IERC20;
 
@@ -17,22 +15,22 @@ contract DesignedVault is AccessibleCommon {
     bool public diffClaimCheck;
     bool public tgeCheck;
 
-    uint256 public firstClaimAmount = 0;     //처음클레임이 다른경우 클레임양
-    uint256 public firstClaimTime;          //처음클레임이 다른경우 시간
+    uint256 public firstClaimAmount = 0;
+    uint256 public firstClaimTime;         
 
-    uint256 public totalAllocatedAmount;    //컨트랙트에서 지급되어야하는 Amount
+    uint256 public totalAllocatedAmount;   
 
-    uint256 public startTime;               //클레임 시작시간
-    uint256 public claimPeriodTimes;        //클레임 간격 시간
-    uint256 public totalClaimCounts;        //총 클레임 횟수 (36)
+    uint256 public startTime;               
+    uint256 public claimPeriodTimes;       
+    uint256 public totalClaimCounts;      
 
-    uint256 public nowClaimRound = 0;       //현재 클레임한 라운드
+    uint256 public nowClaimRound = 0;      
 
-    uint256 public tgeAmount;               //입력 tgeAmount 해야하는 양
-    uint256 public tgeTime;                 //tge를 하는 시간
+    uint256 public tgeAmount;             
+    uint256 public tgeTime;                 
 
-    uint256 public totalClaimsAmount;           //실제로 지급한 claimAmount
-    uint256 public getTgeAmount = 0;          //실제로 지급한 tgeAmount
+    uint256 public totalClaimsAmount;          
+    uint256 public getTgeAmount = 0;        
 
     modifier nonZeroAddress(address _addr) {
         require(_addr != address(0), "DesignedVault: zero address");
@@ -58,9 +56,9 @@ contract DesignedVault is AccessibleCommon {
     }
 
     ///@dev initialization function
-    ///@param _totalAllocatedAmount total allocated amount  //Vault가 가지고 있는 총량
-    ///@param _totalClaims total available claim count  //클레임 총 횟수
-    ///@param _startTime start time             //클레임 시작 시간 (11월 30일 무시, tge무시, 12월 5일 오후 5시)
+    ///@param _totalAllocatedAmount total allocated amount  
+    ///@param _totalClaims total available claim count  
+    ///@param _startTime start time             
     ///@param _periodTimesPerClaim period time per claim
     function initialize(
         uint256 _totalAllocatedAmount,

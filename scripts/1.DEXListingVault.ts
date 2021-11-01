@@ -29,6 +29,7 @@ async function main() {
   const tgeTime = 1636099200    //2021년 11월 5일 금요일 오후 5:00:00 GMT+09:00
   const tgeAmount = 250000      //250,000
   const tgeBigAmount =  BigNumber.from(tgeAmount).mul(BigNumber.from(BASE_TEN).pow(decimals))
+  //250,000.000000000000000000
 
   let tx = await vaultContract.connect(deployer).tgeSetting(tgeBigAmount,tgeTime)
   await tx.wait()
