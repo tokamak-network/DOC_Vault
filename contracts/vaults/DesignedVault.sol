@@ -30,7 +30,13 @@ contract DesignedVault is AccessibleCommon {
     uint256 public tgeTime;                 
 
     uint256 public totalClaimsAmount;          
-    uint256 public getTgeAmount = 0;        
+    uint256 public getTgeAmount = 0;
+
+    event Claimed(
+        address indexed caller,
+        uint256 amount,
+        uint256 totalClaimedAmount
+    );        
 
     modifier nonZeroAddress(address _addr) {
         require(_addr != address(0), "DesignedVault: zero address");
@@ -154,6 +160,8 @@ contract DesignedVault is AccessibleCommon {
         require(doc.balanceOf(address(this)) >= tgeAmount && getTgeAmount == 0, "DesignedValut: already get tge");
         getTgeAmount = getTgeAmount + tgeAmount;
         doc.safeTransfer(_account, tgeAmount);
+
+        emit Claimed(msg.sender, tgeAmount, getTgeAmount);
     }
 
     function claim(address _account)
@@ -191,6 +199,8 @@ contract DesignedVault is AccessibleCommon {
         nowClaimRound = curRound;
         totalClaimsAmount = totalClaimsAmount + amount;
         doc.safeTransfer(_account, amount);
+
+        emit Claimed(msg.sender, amount, totalClaimsAmount);
     }
 
     function withdraw(address _account, uint256 _amount)
