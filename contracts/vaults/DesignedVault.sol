@@ -32,7 +32,7 @@ contract DesignedVault is AccessibleCommon {
     uint256 public tgeTime;                 //tge를 하는 시간
 
     uint256 public totalClaimsAmount;           //실제로 지급한 claimAmount
-    uint256 public totalTgeAmount = 0;          //실제로 지급한 tgeAmount
+    uint256 public getTgeAmount = 0;          //실제로 지급한 tgeAmount
 
     modifier nonZeroAddress(address _addr) {
         require(_addr != address(0), "DesignedVault: zero address");
@@ -119,7 +119,7 @@ contract DesignedVault is AccessibleCommon {
         if(diffClaimCheck) {
             if (block.timestamp < firstClaimTime) {
                 round = 0;
-            } else if(firstClaimTime < block.timestamp && block.timestamp < startTime) {
+            } else if(block.timestamp < startTime) {
                 round = 1;
             } else {
                 round = (block.timestamp - startTime) / claimPeriodTimes;
@@ -140,10 +140,10 @@ contract DesignedVault is AccessibleCommon {
         if(diffClaimCheck && _round == 1) {
             amount = firstClaimAmount;
         } else if(diffClaimCheck){
-            remainAmount = totalAllocatedAmount - totalTgeAmount - firstClaimAmount;
+            remainAmount = totalAllocatedAmount - getTgeAmount - firstClaimAmount;
             amount = remainAmount/(totalClaimCounts-1);
         } else {
-            remainAmount = totalAllocatedAmount - totalTgeAmount;
+            remainAmount = totalAllocatedAmount - getTgeAmount;
             amount = remainAmount/totalClaimCounts;
         }
     }
@@ -153,8 +153,8 @@ contract DesignedVault is AccessibleCommon {
         onlyOwner
     {   
         require(block.timestamp > tgeTime && tgeAmount != 0, "Designed Valut: need the tgeTime");
-        require(doc.balanceOf(address(this)) >= tgeAmount && totalTgeAmount == 0, "DesignedValut: already get tge");
-        totalTgeAmount = totalTgeAmount + tgeAmount;
+        require(doc.balanceOf(address(this)) >= tgeAmount && getTgeAmount == 0, "DesignedValut: already get tge");
+        getTgeAmount = getTgeAmount + tgeAmount;
         doc.safeTransfer(_account, tgeAmount);
     }
 
@@ -170,28 +170,36 @@ contract DesignedVault is AccessibleCommon {
         } else {
             time = startTime;
         }
-
         require(block.timestamp > time, "DesignedVault: not started yet");
+        require(totalAllocatedAmount > totalClaimsAmount,"DesignedVault: already All get");
 
         uint256 curRound = currentRound();
         uint256 amount = calcalClaimAmount(curRound);
+
+        require(curRound != nowClaimRound,"DesignedVault: already get this round");
 
         if(curRound != 1 && diffClaimCheck && totalClaimsAmount < firstClaimAmount) {
             count = curRound - nowClaimRound;
             amount = (amount * (count-1)) + firstClaimAmount;
         } else if (curRound >= totalClaimCounts) {
-            amount = totalAllocatedAmount - totalClaimsAmount - totalTgeAmount;
+            amount = totalAllocatedAmount - totalClaimsAmount - getTgeAmount;
         } else {
             count = curRound - nowClaimRound;
             amount = (amount * count);
         }
-        
-        require(curRound != nowClaimRound,"DesignedVault: already get this round");
-        require(totalAllocatedAmount > totalClaimsAmount,"DesignedVault: already All get");
+
         require(doc.balanceOf(address(this)) >= amount,"DesignedVault: dont have doc");
 
         nowClaimRound = curRound;
         totalClaimsAmount = totalClaimsAmount + amount;
         doc.safeTransfer(_account, amount);
+    }
+
+    function withdraw(address _account, uint256 _amount)
+        external    
+        onlyOwner
+    {
+        require(doc.balanceOf(address(this)) >= _amount,"DesignedVault: dont have doc");
+        doc.safeTransfer(_account, _amount);
     }
 }

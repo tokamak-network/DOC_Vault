@@ -14,12 +14,19 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const Greeter = await ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, Hardhat!");
+  const [deployer] = await ethers.getSigners()
+  console.log("Deploying contract with the account :", deployer.address)
 
-  await greeter.deployed();
+  let docAddress = "0xb109f4c20bdb494a63e32aa035257fba0a4610a4"
 
-  console.log("Greeter deployed to:", greeter.address);
+  const LPStakingVault = await ethers.getContractFactory("LPStakingVault");
+  const lpStaking = await LPStakingVault.deploy(docAddress);
+
+  await lpStaking.deployed();
+
+  console.log("lpstaking Address:", lpStaking.address);
+  //전송 후 DOC 토큰 전송 필요
+  //npx hardhat verify --contract contracts/LPStakingVault.sol:LPStakingVault 0x4E77733e1ce977BC67DC77dAc725f4021aA5aDb1 0xb109f4c20bdb494a63e32aa035257fba0a4610a4 --network rinkeby
 }
 
 // We recommend this pattern to be able to use async/await everywhere
