@@ -13,7 +13,6 @@ contract DesignedVault is AccessibleCommon {
     IERC20 public doc;
 
     bool public diffClaimCheck;
-    bool public tgeCheck;
 
     uint256 public firstClaimAmount = 0;
     uint256 public firstClaimTime;         
@@ -30,7 +29,7 @@ contract DesignedVault is AccessibleCommon {
     uint256 public tgeTime;                 
 
     uint256 public totalClaimsAmount;          
-    uint256 public getTgeAmount = 0;
+    uint256 public getTgeAmount;
 
     event Claimed(
         address indexed caller,

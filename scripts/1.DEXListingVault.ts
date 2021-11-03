@@ -12,8 +12,8 @@ async function main() {
   const [deployer] = await ethers.getSigners()
   console.log("Deploying contract with the account :", deployer.address)
 
-  let docAddress = "0xb109f4c20bdb494a63e32aa035257fba0a4610a4" //rinkeby
-  // let docAddress = "0x0e498afce58dE8651B983F136256fA3b8d9703bc" //mainnet
+  // let docAddress = "0xb109f4c20bdb494a63e32aa035257fba0a4610a4" //rinkeby
+  let docAddress = "0x0e498afce58dE8651B983F136256fA3b8d9703bc" //mainnet
 
   const Vault = await ethers.getContractFactory("DEXListingVault");
   const vaultContract = await Vault.deploy(docAddress);

@@ -12,8 +12,8 @@ async function main() {
   const [deployer] = await ethers.getSigners()
   console.log("Deploying contract with the account :", deployer.address)
 
-  let docAddress = "0xb109f4c20bdb494a63e32aa035257fba0a4610a4" //rinkeby
-  // let docAddress = "0x0e498afce58dE8651B983F136256fA3b8d9703bc" //mainnet
+  // let docAddress = "0xb109f4c20bdb494a63e32aa035257fba0a4610a4" //rinkeby
+  let docAddress = "0x0e498afce58dE8651B983F136256fA3b8d9703bc" //mainnet
 
   const Vault = await ethers.getContractFactory("TreasuryVault");
   const vaultContract = await Vault.deploy(docAddress);
@@ -31,6 +31,7 @@ async function main() {
   const totalClaimCounts = 36             //36회
   const startTime = 1638691200            //2021년 12월 5일 일요일 오후 5:00:00 GMT+09:00
   const claimPeriodTimes = 2592000        //30일
+  // 24,750,000.000000000000000000
 
   let tx = await vaultContract.connect(deployer).initialize(
     totalBigAmount,
