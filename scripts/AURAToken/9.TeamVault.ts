@@ -12,32 +12,39 @@ async function main() {
   const [deployer] = await ethers.getSigners()
   console.log("Deploying contract with the account :", deployer.address)
 
-  let docAddress = "0xb109f4c20bdb494a63e32aa035257fba0a4610a4" //rinkeby
-  // let docAddress = "0x0e498afce58dE8651B983F136256fA3b8d9703bc" //mainnet
+  let auraToken = "0x14f9C438dD5008b1c269659AA3234cBcB431a844" //rinkeby
+  // let auraToken = "0xaEC59E5b4f8DbF513e260500eA96EbA173F74149" //mainnet
 
-  const Vault = await ethers.getContractFactory("DEXListingVault");
-  const vaultContract = await Vault.deploy(docAddress);
+  const Vault = await ethers.getContractFactory("TeamVault");
+  const vaultContract = await Vault.deploy(auraToken);
 
   await vaultContract.deployed();
 
-  console.log("DEXListingVault Address:", vaultContract.address);
+  console.log("TeamVault Address:", vaultContract.address);
   console.log("setting start");
 
   const BASE_TEN = 10
   const decimals = 18
 
-  const tgeTime = 1636099200    //2021년 11월 5일 금요일 오후 5:00:00 GMT+09:00
-  const tgeAmount = 250000      //250,000
-  const tgeBigAmount =  BigNumber.from(tgeAmount).mul(BigNumber.from(BASE_TEN).pow(decimals))
-  //250,000.000000000000000000
+  const totalAllocatedAmount = 5000000   //5,000,000
+  const totalBigAmount = BigNumber.from(totalAllocatedAmount).mul(BigNumber.from(BASE_TEN).pow(decimals))
+  const totalClaimCounts = 36             //36회
+  const startTime = 1673856000            //2023년 1월 16일 월요일 오후 5:00:00
+  const claimPeriodTimes = 2592000        //30일
 
-  let tx = await vaultContract.connect(deployer).tgeSetting(tgeBigAmount,tgeTime)
+  let tx = await vaultContract.connect(deployer).initialize(
+    totalBigAmount,
+    totalClaimCounts,
+    startTime,
+    claimPeriodTimes
+  )
   await tx.wait()
 
-  let tx2 = Number(await vaultContract.tgeAmount())
-  console.log("tx2 :", tx2, ", tgeBigAmount : ", Number(tgeBigAmount))
+  let tx2 = Number(await vaultContract.totalClaimCounts())
+  console.log("tx2 :", tx2, ", totalClaimCounts : ", totalClaimCounts)
+
   console.log("finish")
-  //전송 후 DOC 토큰 전송 필요
+  //전송 후 AURA 토큰 전송 필요
   //npx hardhat verify --contract contracts/DEXListingVault.sol:DEXListingVault a b --network rinkeby
 }
 
