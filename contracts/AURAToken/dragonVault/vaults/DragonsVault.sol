@@ -76,6 +76,7 @@ contract DragonsVault is AccessibleCommon {
     }
 
     function changeToken(address _token) external onlyOwner {
+        require(settingCheck == false, "already setting");
         token = IERC20(_token);
     }
 

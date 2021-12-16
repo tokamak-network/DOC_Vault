@@ -12,8 +12,8 @@ async function main() {
   const [deployer] = await ethers.getSigners()
   console.log("Deploying contract with the account :", deployer.address)
 
-  let auraToken = "0x14f9C438dD5008b1c269659AA3234cBcB431a844" //rinkeby
-  // let auraToken = "0xaEC59E5b4f8DbF513e260500eA96EbA173F74149" //mainnet
+  // let auraToken = "0x14f9C438dD5008b1c269659AA3234cBcB431a844" //rinkeby
+  let auraToken = "0xaEC59E5b4f8DbF513e260500eA96EbA173F74149" //mainnet
 
   const Vault = await ethers.getContractFactory("TeamVault");
   const vaultContract = await Vault.deploy(auraToken);
