@@ -44,3 +44,28 @@
 `npx hardhat run scripts/9.DAOFundVault.ts --network mainnet`
 
 
+# AURA Vault
+
+<br> -- mainnet --
+
+<br>* PrivateSaleVault : ["0xAd04E4472F21db55648796e040D56F568460678f"](https://etherscan.io/address/0xAd04E4472F21db55648796e040D56F568460678f)
+
+<br>* PublicSaleVault : ["0x3B75d3f628C29d357b484EA7d091faEd63419267"](https://etherscan.io/address/0x3B75d3f628C29d357b484EA7d091faEd63419267)
+
+<br>* LiquidityVault : ["0x5d768706b93faa1dbc01810e4ad0ecfcfd74c538"](https://etherscan.io/address/0x5d768706b93faa1dbc01810e4ad0ecfcfd74c538)
+
+<br>* TONStakerVault : ["0xdafe12279b10a25cbb3b496f585c493dbf8b60a7"](https://etherscan.io/address/0xdafe12279b10a25cbb3b496f585c493dbf8b60a7)
+
+<br>* TOSStakerVault : ["0x877a07a2944347512f5197c88bcf212848243108"](https://etherscan.io/address/0x877a07a2944347512f5197c88bcf212848243108)
+
+<br>* WTONTOSLPRewardVault : ["0x2F81b06b63d33Af6c3b3B5F4C5efC340b3111A55"](https://etherscan.io/address/0x2F81b06b63d33Af6c3b3B5F4C5efC340b3111A55)
+
+<br>* PlayToEarnVault : ["0x0bA33A31C081015D7c11D42514aDC705454D15c2"](https://etherscan.io/address/0x0bA33A31C081015D7c11D42514aDC705454D15c2)
+
+<br>* EcosystemVault : ["0x5fe5cE2D135a40ec8A376c809EE788b70a86d526"](https://etherscan.io/address/0x5fe5cE2D135a40ec8A376c809EE788b70a86d526)
+
+<br>* Reserve Vault : ["0xe4De270b08B0661BC1008Cc0a0A5Bda8a63dF3aC"](https://etherscan.io/address/0xe4De270b08B0661BC1008Cc0a0A5Bda8a63dF3aC)
+
+<br>* Marketing Vault : ["0xa5284B3cfa5e12398D2Cab77110A2bDbBB7bDbF1"](https://etherscan.io/address/0xa5284B3cfa5e12398D2Cab77110A2bDbBB7bDbF1)
+
+<br>* Team Vault : ["0xbde53d45346949e6a21a1521bbc4fe01151a2da4"](https://etherscan.io/address/0xbde53d45346949e6a21a1521bbc4fe01151a2da4)
